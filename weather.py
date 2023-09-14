@@ -43,7 +43,7 @@ class WeatherInfo:
         if not self.lat or not self.lon:
             geoRequest = self.GenerateRequest("geo")
             r = requests.get(geoRequest)
-            if r.status_code == '200':
+            if r.status_code == 200:
                 getjson = json.loads(r.text)
                 self.lat =  getjson[0]["lat"]
                 self.lon = getjson[0]["lon"]
@@ -51,7 +51,7 @@ class WeatherInfo:
 
         weatherRequest = self.GenerateRequest("weather")
         r = requests.get(weatherRequest)
-        if r.status_code == '200':
+        if r.status_code == 200:
             getjson = json.loads(r.text)
             self.timezone = getjson["timezone"]
 
