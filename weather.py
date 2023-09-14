@@ -1,9 +1,7 @@
 import requests
 from datetime import datetime
 import json
-
-
-API_KEY = "ed10aedbdb2eeb0761de8ebf471afe2c"
+from config import API_KEY
 
 class WeatherInfo:
     # Constructor for the class
@@ -24,16 +22,6 @@ class WeatherInfo:
         self.windSpeed = ""
         self.weatherDescription = ""
         self.lastUpdate = None
-
-    # Checking the time since last update the weather info
-    # def CheckTimeUpdate(self) -> bool:
-    #     # TO DO: Optimize this updated time comparing
-    #     if self.lastUpdate:
-    #         newTime = datetime.now()
-    #         if newTime > self.lastUpdate:
-    #             return True
-
-    #     return False
     
     def GenerateRequest(self, type) -> str:
         # default setting
@@ -55,28 +43,30 @@ class WeatherInfo:
         if not self.lat or not self.lon:
             geoRequest = self.GenerateRequest("geo")
             r = requests.get(geoRequest)
-            getjson = json.loads(r.text)
-            self.lat =  getjson[0]["lat"]
-            self.lon = getjson[0]["lon"]
+            if r.status_code == '200':
+                getjson = json.loads(r.text)
+                self.lat =  getjson[0]["lat"]
+                self.lon = getjson[0]["lon"]
         
 
         weatherRequest = self.GenerateRequest("weather")
         r = requests.get(weatherRequest)
-        getjson = json.loads(r.text)
-        self.timezone = getjson["timezone"]
+        if r.status_code == '200':
+            getjson = json.loads(r.text)
+            self.timezone = getjson["timezone"]
 
-        tempVal = getjson["current"]["temp"]
-        self.tempC = self.TempConvert("c", tempVal)
-        self.tempF = self.TempConvert("f", tempVal)
+            tempVal = getjson["current"]["temp"]
+            self.tempC = self.TempConvert("c", tempVal)
+            self.tempF = self.TempConvert("f", tempVal)
 
-        feelsLikeVal = getjson["current"]["feels_like"]
-        self.feelsLikeC = self.TempConvert("c", feelsLikeVal)
-        self.feelsLikeF = self.TempConvert("f", feelsLikeVal)
+            feelsLikeVal = getjson["current"]["feels_like"]
+            self.feelsLikeC = self.TempConvert("c", feelsLikeVal)
+            self.feelsLikeF = self.TempConvert("f", feelsLikeVal)
 
-        self.pressure = getjson["current"]["pressure"]
-        self.humidity = getjson["current"]["humidity"]
-        self.windSpeed = getjson["current"]["wind_speed"]
-        self.weatherDescription = getjson["current"]["weather"][0]["description"]
+            self.pressure = getjson["current"]["pressure"]
+            self.humidity = getjson["current"]["humidity"]
+            self.windSpeed = getjson["current"]["wind_speed"]
+            self.weatherDescription = getjson["current"]["weather"][0]["description"]   
 
 
     # This function mostly likely use for testing
